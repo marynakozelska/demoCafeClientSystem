@@ -15,17 +15,21 @@ To create a web-application allowing users:
  - to provide feedback and ratings for their dining experience.
 
 ## User personas
+
 **Unauthorized website user**
 - View home page
 - View menu
 - Login/Sign up to the application
+
 **Authorized user**
 - Place orders
 - Leave reviews
 - Manage their profile
+
 **Waiter**
 - Accept orders
 - Manage their profile
+
 **Admin**
-  - Manage menu
-  - Manage users roles
+- Manage menu
+- Manage users roles
