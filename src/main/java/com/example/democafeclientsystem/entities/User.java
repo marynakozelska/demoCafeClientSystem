@@ -8,6 +8,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import javax.persistence.*;
 import javax.persistence.Table;
+import javax.validation.constraints.Email;
+import javax.validation.constraints.Pattern;
 import java.util.*;
 
 @Getter
@@ -22,10 +24,13 @@ public class User implements UserDetails {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column
+    @Pattern(regexp = "^[a-zA-Z]+$")
     private String firstName;
     @Column
+    @Email
     private String email;
     @Column
+    @Pattern(regexp = "^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z])(?=.*[._-]).{8,}$")
     private String password;
     @ManyToOne
     @JoinColumn(name = "role_id")
