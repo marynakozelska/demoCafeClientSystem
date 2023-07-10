@@ -5,6 +5,8 @@ import lombok.*;
 
 import javax.persistence.*;
 import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
 
 @Getter
 @Setter
@@ -18,6 +20,7 @@ public class MenuItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
     @Column
+    @NotBlank
     private String name;
     @Column
     private double price;
