@@ -2,7 +2,6 @@ package com.example.democafeclientsystem.controllers;
 
 import com.example.democafeclientsystem.dto.MenuItemDTO;
 import com.example.democafeclientsystem.entities.MenuItem;
-import com.example.democafeclientsystem.enums.FoodCategory;
 import com.example.democafeclientsystem.service.MenuService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
