@@ -1,7 +1,6 @@
 package com.example.democafeclientsystem.entities;
 
 import com.example.democafeclientsystem.enums.FoodCategory;
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.*;
 
 import javax.persistence.*;

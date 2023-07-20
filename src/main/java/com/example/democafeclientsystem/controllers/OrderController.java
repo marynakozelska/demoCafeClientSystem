@@ -8,9 +8,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/cart")
+@RequestMapping("/order")
 public class OrderController {
     private final OrderService service;
 
@@ -25,6 +27,15 @@ public class OrderController {
                                              @RequestBody OrderDTO orderDTO) {
 
         return new ResponseEntity<>(service.addOrderByAuth(authentication, orderDTO), HttpStatus.OK);
+    }
+
+    @GetMapping("/manage")
+    public ResponseEntity<List<OrderDTO>> getOrders() {
+        return new ResponseEntity<>(service.getAllOrders(), HttpStatus.OK);
+    }
+    @GetMapping("/manage/active")
+    public ResponseEntity<List<OrderDTO>> getActiveOrders() {
+        return new ResponseEntity<>(service.getAllActiveOrders(), HttpStatus.OK);
     }
 
 }

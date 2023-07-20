@@ -40,6 +40,24 @@ public class OrderService {
         return orderToDto(newOrder);
     }
 
+    public List<OrderDTO> getAllOrders() {
+        List<Order> orders = repository.findAll();
+
+        return orders
+                .stream()
+                .map(this::orderToDto)
+                .toList();
+    }
+
+    public List<OrderDTO> getAllActiveOrders() {
+        List<Order> orders = repository.findByIsActiveTrue();
+
+        return orders
+                .stream()
+                .map(this::orderToDto)
+                .toList();
+    }
+
     private OrderDTO orderToDto(Order order) {
         long[] items = order.getItems().stream()
                 .mapToLong(item -> item.getMenuItem().getId())
