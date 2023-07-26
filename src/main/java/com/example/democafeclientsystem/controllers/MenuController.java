@@ -22,6 +22,11 @@ public class MenuController {
         return ResponseEntity.ok(service.getMenu());
     }
 
+    @GetMapping("/{id}")
+    public ResponseEntity<MenuItemDTO> getMenuItem(@PathVariable Long id) {
+        return ResponseEntity.ok(service.getMenuItem(id));
+    }
+
     @PostMapping("/manage/add")
     public ResponseEntity<MenuItemDTO> addMenuItem(@Valid @RequestBody MenuItem menuItem) {
         return ResponseEntity.ok(service.addMenuItem(menuItem));
