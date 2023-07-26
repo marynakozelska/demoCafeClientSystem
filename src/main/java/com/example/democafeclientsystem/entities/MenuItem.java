@@ -6,7 +6,7 @@ import lombok.*;
 import javax.persistence.*;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
+import java.util.Set;
 
 @Getter
 @Setter
@@ -18,14 +18,21 @@ import javax.validation.constraints.NotNull;
 public class MenuItem {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private int id;
+    private Long id;
+
     @Column
     @NotBlank
     private String name;
+
     @Column
     private double price;
+
     @Column
     private String description;
+
     @Column
     private FoodCategory category;
+
+    @OneToMany(mappedBy = "menuItem", cascade = CascadeType.ALL)
+    private Set<OrderItem> items;
 }

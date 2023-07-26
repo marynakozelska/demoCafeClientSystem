@@ -8,7 +8,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 public class MenuItemDTO {
-    private int id;
+    private Long id;
     private String name;
     private double price;
     private String description;

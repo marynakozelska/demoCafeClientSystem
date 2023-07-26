@@ -21,12 +21,16 @@ public class User implements UserDetails {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private int id;
+
     @Column
     private String firstName;
+
     @Column
     private String email;
+
     @Column
     private String password;
+
     @ManyToOne
     @JoinColumn(name = "role_id")
     private Role role;

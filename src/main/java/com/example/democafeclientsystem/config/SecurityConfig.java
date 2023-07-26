@@ -25,27 +25,6 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
     private final AuthenticationProvider authenticationProvider;
     private final UserDetailsService userDetailsService;
 
-//    @Bean
-//    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-//
-//        http
-//                .csrf().disable()
-//                .cors().configurationSource(corsConfigurationSource())
-//                .and()
-//                .authorizeRequests()
-//                .antMatchers("/auth/**").permitAll()
-//                .antMatchers("/menu/manage/add").hasRole("ADMIN")
-//                .anyRequest().authenticated()
-//                .and()
-//                .sessionManagement()
-//                .sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                .and()
-//                .authenticationProvider(authenticationProvider)
-//                .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class)
-//                ;
-//        return http.build();
-//    }
-
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         http
@@ -54,6 +33,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .and()
                 .authorizeRequests()
                 .antMatchers("/menu/manage/**").hasRole("ADMIN")
+                .antMatchers("/order/manage/**").hasAnyRole("ADMIN", "BARISTA")
                 .antMatchers("/**/admin/**").hasRole("ADMIN")
                 .antMatchers("/auth/**", "/menu/**").permitAll()
                 .anyRequest().authenticated()
