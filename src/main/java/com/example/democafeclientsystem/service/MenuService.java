@@ -33,6 +33,12 @@ public class MenuService {
         return menuItemToDto(menuItemSaved);
     }
 
+    public MenuItemDTO getMenuItem(Long id) {
+        return menuItemToDto(
+                repository.getReferenceById(id)
+        );
+    }
+
     private MenuItemDTO menuItemToDto(MenuItem menuItem) {
         String category;
         switch (menuItem.getCategory()) {
