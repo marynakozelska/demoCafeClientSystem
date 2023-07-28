@@ -28,24 +28,16 @@ class MenuServiceTest {
     @InjectMocks
     private MenuService underTest;
 
-    @BeforeEach
-    void setUp() {
-        underTest = new MenuService(menuRepository);
-    }
-
     @Test
     void canGetMenu() {
-//        given
         List<MenuItem> menuItems = new ArrayList<>();
         menuItems.add(new MenuItem(1L, "Margarita", 255f, null, FoodCategory.PIZZA, null));
         menuItems.add(new MenuItem(2L, "Spaghetti", 180f, null, FoodCategory.SIDE_DISH, null));
 
         when(menuRepository.findAll()).thenReturn(menuItems);
 
-//        when
         Map<String, List<MenuItemDTO>> result = underTest.getMenu();
 
-//        then
         assertThat(result).isNotNull();
         assertThat(result
                 .get("PIZZA")
@@ -61,7 +53,6 @@ class MenuServiceTest {
 
     @Test
     void canAddMenuItem() {
-//        given
         MenuItem menuItem = MenuItem
                 .builder()
                 .name("Margarita")
@@ -71,10 +62,8 @@ class MenuServiceTest {
 
         when(menuRepository.save(menuItem)).thenReturn(menuItem);
 
-//        when
         underTest.addMenuItem(menuItem);
 
-//        then
         ArgumentCaptor<MenuItem> argumentCaptor = ArgumentCaptor.forClass(MenuItem.class);
         verify(menuRepository).save(argumentCaptor.capture());
 

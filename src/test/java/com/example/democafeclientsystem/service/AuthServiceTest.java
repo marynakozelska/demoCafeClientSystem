@@ -10,7 +10,6 @@ import com.example.democafeclientsystem.exceptions.UserAlreadyExists;
 import com.example.democafeclientsystem.repositories.RoleRepository;
 import com.example.democafeclientsystem.repositories.UserRepository;
 import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
@@ -30,12 +29,12 @@ import static org.mockito.Mockito.*;
 @ExtendWith(MockitoExtension.class)
 class AuthServiceTest {
 
+    @InjectMocks
+    private AuthService underTest;
     @Mock
     private UserRepository userRepository;
     @Mock
     private RoleRepository roleRepository;
-    @InjectMocks
-    private AuthService underTest;
     @Mock
     private PasswordEncoder passwordEncoder;
     @Mock
@@ -48,6 +47,7 @@ class AuthServiceTest {
 
     @BeforeAll
     static void beforeAll() {
+
         Role userRole = new Role();
         userRole.setId(1);
         userRole.setName("USER");
@@ -61,19 +61,8 @@ class AuthServiceTest {
                 .build();
     }
 
-    @BeforeEach
-    void setUp() {
-        underTest = new AuthService(
-                userRepository,
-                roleRepository,
-                passwordEncoder,
-                jwtUtil,
-                authenticationManager);
-    }
-
     @Test
     void register() {
-//        given
         RegisterRequest request = new RegisterRequest(
                 user.getFirstName(),
                 user.getEmail(),
@@ -85,15 +74,12 @@ class AuthServiceTest {
         when(passwordEncoder.encode(any())).thenReturn("hashedPassword");
         when(jwtUtil.generateToken(any(User.class))).thenReturn("jwtToken");
 
-//        when
         AuthResponse response = underTest.register(request);
 
-//        then
         assertThat(response).isNotNull();
         assertThat(response.getToken()).isNotNull();
         assertThat(response.getRole()).isEqualTo(user.getRole().getName());
 
-        // Verify that the repository methods are called as expected
         verify(userRepository).existsByEmail(user.getEmail());
         verify(roleRepository).findByName(USER_ROLE_NAME);
         verify(userRepository).save(any(User.class));

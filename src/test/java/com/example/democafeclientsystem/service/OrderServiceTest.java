@@ -60,14 +60,8 @@ class OrderServiceTest {
         orderItem2 = new OrderItem(menuItem2, 4);
     }
 
-    @BeforeEach
-    void setUp() {
-        underTest = new OrderService(orderRepository, menuRepository);
-    }
-
     @Test
     void canGetActiveOrderByAuth() {
-//        given
         Order order = Order
                 .builder()
                 .tableNumber(11)
@@ -77,29 +71,23 @@ class OrderServiceTest {
                 .build();
         when(orderRepository.findByUserAndIsActiveTrue(user)).thenReturn(order);
 
-//        when
         OrderDTO result = underTest.getActiveOrderByAuth(authentication);
 
-//        then
         assertThat(result.getTableNumber()).isEqualTo(order.getTableNumber());
         assertThat(result.getItems().length).isEqualTo(order.getItems().size());
     }
 
     @Test
     void canGetNoActiveOrderByAuth() {
-//        given
         when(orderRepository.findByUserAndIsActiveTrue(user)).thenReturn(null);
 
-//        when
         OrderDTO result = underTest.getActiveOrderByAuth(authentication);
 
-//        then
         assertThat(result).isEqualTo(null);
     }
 
     @Test
     void canAddOrderByAuth() {
-//        given
         OrderDTO orderDTO = OrderDTO
                 .builder()
                 .tableNumber(2)
@@ -115,10 +103,8 @@ class OrderServiceTest {
         when(menuRepository.findById(1L)).thenReturn(Optional.ofNullable(menuItem1));
         when(orderRepository.save(any())).thenReturn(order);
 
-//        when
         underTest.addOrderByAuth(authentication, orderDTO);
 
-//        then
         ArgumentCaptor<Order> argumentCaptor = ArgumentCaptor.forClass(Order.class);
         verify(orderRepository).save(argumentCaptor.capture());
         Order capturedOrder = argumentCaptor.getValue();
@@ -130,7 +116,6 @@ class OrderServiceTest {
 
     @Test
     void getAllOrders() {
-//        given
         Order order = Order
                 .builder()
                 .user(user)
@@ -140,10 +125,8 @@ class OrderServiceTest {
 
         when(orderRepository.findAll()).thenReturn(List.of(order));
 
-//        when
         List<OrderDTO> orderDTOS = underTest.getAllOrders();
 
-//        then
         assertThat(orderDTOS.size()).isEqualTo(1);
         assertThat(orderDTOS.get(0).getTableNumber()).isEqualTo(order.getTableNumber());
         assertThat(orderDTOS.get(0).getItems().length).isEqualTo(order.getItems().size());
@@ -151,7 +134,6 @@ class OrderServiceTest {
 
     @Test
     void getAllActiveOrders() {
-//        given
         Order order1 = Order
                 .builder()
                 .id(1L)
@@ -169,10 +151,8 @@ class OrderServiceTest {
 
         when(orderRepository.findByIsActiveTrue()).thenReturn(List.of(order1, order2));
 
-//        when
         List<OrderDTO> result = underTest.getAllActiveOrders();
 
-//        then
         assertThat(result.get(0).getTableNumber()).isEqualTo(order1.getTableNumber());
         assertThat(result.get(1).getTableNumber()).isEqualTo(order2.getTableNumber());
 
