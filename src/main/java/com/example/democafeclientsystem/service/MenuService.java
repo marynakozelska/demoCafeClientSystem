@@ -39,6 +39,11 @@ public class MenuService {
         );
     }
 
+    public void deleteMenuItem(Long id) {
+        MenuItem menuItem = repository.getReferenceById(id);
+        repository.delete(menuItem);
+    }
+
     private MenuItemDTO menuItemToDto(MenuItem menuItem) {
         String category;
         switch (menuItem.getCategory()) {

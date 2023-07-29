@@ -31,4 +31,10 @@ public class MenuController {
     public ResponseEntity<MenuItemDTO> addMenuItem(@Valid @RequestBody MenuItem menuItem) {
         return ResponseEntity.ok(service.addMenuItem(menuItem));
     }
+
+    @DeleteMapping("/manage/{id}")
+    public ResponseEntity<String> deleteMenuItem(@PathVariable Long id) {
+        service.deleteMenuItem(id);
+        return ResponseEntity.ok("Menu item was deleted");
+    }
 }
