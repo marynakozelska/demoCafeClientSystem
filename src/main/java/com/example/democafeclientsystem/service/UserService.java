@@ -53,10 +53,10 @@ public class UserService implements UserDetailsService {
     }
 
     public List<UserDTO> manageGetAllUsers() {
-        List<User> volunteers = new ArrayList<>();
-        userRepository.findAll().iterator().forEachRemaining(volunteers::add);
+        List<User> users = new ArrayList<>();
+        userRepository.findAll().iterator().forEachRemaining(users::add);
 
-        return volunteers
+        return users
                 .stream()
                 .map(this::userToDto)
                 .toList();
@@ -65,25 +65,12 @@ public class UserService implements UserDetailsService {
 
 //    DTO
 
-    private User dtoToUser(UserDTO userDTO) {
-        User user = new User();
-        user.setId(userDTO.getId());
-        user.setFirstName(userDTO.getFirstName());
-        user.setEmail(userDTO.getEmail());
-        user.setPassword(userDTO.getPassword());
-        user.setRole(
-                roleRepository.findByName(userDTO.getRole())
-        );
-
-        return user;
-    }
-
     private UserDTO userToDto(User user) {
         UserDTO userDTO = new UserDTO();
         userDTO.setId(user.getId());
         userDTO.setFirstName(user.getFirstName());
         userDTO.setEmail(user.getEmail());
-        userDTO.setPassword(userDTO.getPassword());
+        userDTO.setPassword(user.getPassword());
         userDTO.setRole(user.getRole().getName());
 
         return userDTO;
