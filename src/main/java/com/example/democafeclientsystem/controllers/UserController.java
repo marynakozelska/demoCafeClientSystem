@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @Controller
-@RequestMapping("/profile")
+@RequestMapping
 @AllArgsConstructor
 public class UserController {
     public UserService service;
 
-    @GetMapping
+    @GetMapping("/profile")
     public ResponseEntity<UserDTO> getUser(Authentication authentication) {
 
         return new ResponseEntity<>(service.getUserByAuth(authentication), HttpStatus.OK);
@@ -25,23 +25,27 @@ public class UserController {
 
 //    ADMIN MANAGING
 
-    @GetMapping("/admin/manage")
+    @GetMapping("/users/manage")
     public ResponseEntity<List<UserDTO>> getAllUsers() {
 
         return new ResponseEntity<>(service.manageGetAllUsers(), HttpStatus.OK);
     }
 
-    @GetMapping("/admin/manage/{id}")
+    @GetMapping("/users/manage/{id}")
     public ResponseEntity<UserDTO> manageGetUser(@PathVariable("id") int id) {
 
         return new ResponseEntity<>(service.manageGetUser(id), HttpStatus.OK);
     }
 
-    @PutMapping("/admin/manage/{id}")
+    @PutMapping("/users/manage/{id}")
     public ResponseEntity<UserDTO> manageUpdateUser(@PathVariable("id") int id,
                                                     @RequestBody String role) {
 
         return new ResponseEntity<>(service.manageUpdateUser(id, role), HttpStatus.OK);
     }
+
+//    TODO: get a list of orders by a particular user
+
+//    TODO: get a number of orders by a particular user ?
 
 }
