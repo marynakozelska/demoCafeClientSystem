@@ -3,9 +3,11 @@ package com.example.democafeclientsystem.service;
 import com.example.democafeclientsystem.dto.MenuItemDTO;
 import com.example.democafeclientsystem.entities.MenuItem;
 import com.example.democafeclientsystem.repositories.MenuRepository;
+import com.example.democafeclientsystem.repositories.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -14,6 +16,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class MenuService {
     private final MenuRepository repository;
+    private final OrderRepository orderRepository;
 
     public Map<String, List<MenuItemDTO>> getMenu() {
 
@@ -65,5 +68,27 @@ public class MenuService {
                 .price(menuItem.getPrice())
                 .category(category)
                 .build();
+    }
+
+    public List<MenuItemDTO> getTopMenuItem(int numberOfItems) {
+
+        List<Object[]> popularFoodData = orderRepository.findMostPopularFood();
+        List<MenuItem> topMenuItems = new ArrayList<>();
+
+        for (Object[] data : popularFoodData) {
+            Long menuItemId = (Long) data[0];
+            MenuItem menuItem = repository.getReferenceById(menuItemId);
+
+            topMenuItems.add(menuItem);
+
+            if (topMenuItems.size() >= numberOfItems) {
+                break;
+            }
+        }
+
+        return topMenuItems
+                .stream()
+                .map(this::menuItemToDto)
+                .toList();
     }
 }
