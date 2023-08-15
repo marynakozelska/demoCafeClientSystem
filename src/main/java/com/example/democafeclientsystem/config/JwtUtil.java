@@ -5,6 +5,8 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Component;
 
@@ -15,11 +17,28 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 
+@Slf4j
 @Component
 public class JwtUtil {
-//    jwt - json web token
+    //    jwt - json web token
+    private String secret;
+    private int jwtExpirationInHours;
+    private int refreshExpirationDateInHours;
 
-    private String SECRET_KEY = "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855";
+    @Value("${jwt.secret}")
+    public void setSecret(String secret) {
+        this.secret = secret;
+    }
+
+    @Value("${jwt.expirationDateInHours}")
+    public void setJwtExpirationInHours(int jwtExpirationInHours) {
+        this.jwtExpirationInHours = jwtExpirationInHours;
+    }
+
+    @Value("${jwt.refreshExpirationDateInHours}")
+    public void setRefreshExpirationDateInHours(int refreshExpirationDateInHours) {
+        this.refreshExpirationDateInHours = refreshExpirationDateInHours;
+    }
 
     public String extractUsername(String token) {
         return extractClaim(token, Claims::getSubject);
@@ -34,16 +53,16 @@ public class JwtUtil {
         return claimsResolver.apply(claims);
     }
 
-    private Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(String token) {
         return Jwts
                 .parser()
-                .setSigningKey(SECRET_KEY)
+                .setSigningKey(secret)
                 .parseClaimsJws(token)
                 .getBody();
     }
 
     private Key getSignInKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(SECRET_KEY);
+        byte[] keyBytes = Decoders.BASE64.decode(secret);
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
@@ -58,15 +77,27 @@ public class JwtUtil {
     }
 
     private String createToken(Map<String, Object> claims, UserDetails userDetails) {
-        return Jwts
-                .builder()
+        log.info("Creating token...");
+        return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(userDetails.getUsername())
                 .claim("authorities", userDetails.getAuthorities())
                 .setIssuedAt(new Date(System.currentTimeMillis()))
-                .setExpiration(new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(24)))
-                .signWith(SignatureAlgorithm.HS256, SECRET_KEY)
+                .setExpiration(new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(jwtExpirationInHours)))
+                .signWith(SignatureAlgorithm.HS512, secret)
                 .compact();
+    }
+
+    public String generateRefreshToken(Map<String, Object> claims, UserDetails userDetails) {
+        log.info("Generating refresh token...");
+        return Jwts.builder()
+                .setClaims(claims)
+                .setSubject(userDetails.getUsername())
+                .claim("authorities", userDetails.getAuthorities())
+                .setIssuedAt(new Date(System.currentTimeMillis()))
+                .setExpiration(new Date(System.currentTimeMillis() + TimeUnit.HOURS.toMillis(refreshExpirationDateInHours)))
+                .signWith(SignatureAlgorithm.HS512, secret).compact();
+
     }
 
     public Boolean isTokenValid(String token, UserDetails userDetails) {
