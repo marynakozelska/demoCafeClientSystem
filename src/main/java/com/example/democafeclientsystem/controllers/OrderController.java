@@ -19,9 +19,15 @@ public class OrderController {
     private final OrderService service;
 
     @GetMapping
-    public ResponseEntity<OrderDTO> getOrder(Authentication authentication) {
+    public ResponseEntity<List<OrderResponse>> getActiveOrdersByAuth(Authentication authentication) {
 
-        return new ResponseEntity<>(service.getActiveOrderByAuth(authentication), HttpStatus.OK);
+        return new ResponseEntity<>(service.getActiveOrdersByAuth(authentication), HttpStatus.OK);
+    }
+
+    @GetMapping("/previous")
+    public ResponseEntity<List<OrderResponse>> getPreviousOrdersByAuth(Authentication authentication) {
+
+        return new ResponseEntity<>(service.getPreviousOrdersByAuth(authentication), HttpStatus.OK);
     }
 
     @PostMapping("/add")

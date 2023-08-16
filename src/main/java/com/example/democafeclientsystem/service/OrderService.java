@@ -6,6 +6,7 @@ import com.example.democafeclientsystem.dto.OrderItemDTO;
 import com.example.democafeclientsystem.dto.OrderResponse;
 import com.example.democafeclientsystem.entities.*;
 import com.example.democafeclientsystem.enums.OrderStatus;
+import com.example.democafeclientsystem.exceptions.ExceededOrderLimitException;
 import com.example.democafeclientsystem.repositories.MenuRepository;
 import com.example.democafeclientsystem.repositories.OrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -21,20 +22,33 @@ public class OrderService {
     private final OrderRepository repository;
     private final MenuRepository menuRepository;
 
-    public OrderDTO getActiveOrderByAuth(Authentication authentication) {
+    public List<OrderResponse> getActiveOrdersByAuth(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        Order order = repository.findByUserAndOrderStatusNot(user, OrderStatus.ARCHIVE);
+        List<Order> orders = repository.findByUserAndOrderStatusNot(user, OrderStatus.ARCHIVE);
 
-        if (order != null) {
-            return orderToDto(order);
-        }
+        return orders
+                .stream()
+                .map(this::orderToResponse)
+                .toList();
+    }
 
-        return null;
+    public List<OrderResponse> getPreviousOrdersByAuth(Authentication authentication) {
+        User user = (User) authentication.getPrincipal();
+        List<Order> orders = repository.findByUserAndOrderStatusIs(user, OrderStatus.ARCHIVE);
+
+        return orders
+                .stream()
+                .map(this::orderToResponse)
+                .toList();
     }
 
     public OrderDTO addOrderByAuth(Authentication authentication,
                                    OrderDTO orderDTO) {
         User user = (User) authentication.getPrincipal();
+
+        if (getActiveOrdersByAuth(authentication).size() >= 2) {
+            throw new ExceededOrderLimitException();
+        }
 
         Order order = dtoToOrder(orderDTO);
         order.setUser(user);
