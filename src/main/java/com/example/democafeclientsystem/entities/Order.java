@@ -1,5 +1,6 @@
 package com.example.democafeclientsystem.entities;
 
+import com.example.democafeclientsystem.enums.OrderStatus;
 import lombok.*;
 
 import javax.persistence.*;
@@ -27,31 +28,16 @@ public class Order {
 
     private int tableNumber;
 
-    private boolean isActive;
+    @Enumerated
+    private OrderStatus orderStatus;
 
-    private boolean isPayed;
+//    TODO: add payment method
 
     public Order(Set<OrderItem> items, User user, int tableNumber) {
         this.items = items;
         this.user = user;
         this.tableNumber = tableNumber;
-        isActive = true;
-        isPayed = false;
+        this.orderStatus = OrderStatus.NEW;
     }
 
-    public boolean getIsActive() {
-        return isActive;
-    }
-
-    public void setIsActive(boolean active) {
-        isActive = active;
-    }
-
-    public boolean getIsPayed() {
-        return isPayed;
-    }
-
-    public void setIsPayed(boolean payed) {
-        isPayed = payed;
-    }
 }

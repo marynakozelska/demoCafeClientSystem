@@ -27,8 +27,19 @@ public class MenuController {
         return ResponseEntity.ok(service.getMenuItem(id));
     }
 
+    @GetMapping("/popular")
+    public ResponseEntity<List<MenuItemDTO>> getTopThreePopularOrder() {
+        return ResponseEntity.ok(service.getTopMenuItem(3));
+    }
+
     @PostMapping("/manage/add")
     public ResponseEntity<MenuItemDTO> addMenuItem(@Valid @RequestBody MenuItem menuItem) {
         return ResponseEntity.ok(service.addMenuItem(menuItem));
+    }
+
+    @DeleteMapping("/manage/{id}")
+    public ResponseEntity<String> deleteMenuItem(@PathVariable Long id) {
+        service.deleteMenuItem(id);
+        return ResponseEntity.ok("Menu item was deleted");
     }
 }

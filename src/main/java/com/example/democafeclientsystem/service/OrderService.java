@@ -1,7 +1,11 @@
 package com.example.democafeclientsystem.service;
 
+import com.example.democafeclientsystem.dto.MenuItemDTO;
 import com.example.democafeclientsystem.dto.OrderDTO;
+import com.example.democafeclientsystem.dto.OrderItemDTO;
+import com.example.democafeclientsystem.dto.OrderResponse;
 import com.example.democafeclientsystem.entities.*;
+import com.example.democafeclientsystem.enums.OrderStatus;
 import com.example.democafeclientsystem.repositories.MenuRepository;
 import com.example.democafeclientsystem.repositories.OrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -19,7 +23,7 @@ public class OrderService {
 
     public OrderDTO getActiveOrderByAuth(Authentication authentication) {
         User user = (User) authentication.getPrincipal();
-        Order order = repository.findByUserAndIsActiveTrue(user);
+        Order order = repository.findByUserAndOrderStatusNot(user, OrderStatus.ARCHIVE);
 
         if (order != null) {
             return orderToDto(order);
@@ -34,27 +38,27 @@ public class OrderService {
 
         Order order = dtoToOrder(orderDTO);
         order.setUser(user);
-        order.setIsActive(true);
+        order.setOrderStatus(OrderStatus.NEW);
 
         Order newOrder = repository.save(order);
         return orderToDto(newOrder);
     }
 
-    public List<OrderDTO> getAllOrders() {
+    public List<OrderResponse> getAllOrders() {
         List<Order> orders = repository.findAll();
 
         return orders
                 .stream()
-                .map(this::orderToDto)
+                .map(this::orderToResponse)
                 .toList();
     }
 
-    public List<OrderDTO> getAllActiveOrders() {
-        List<Order> orders = repository.findByIsActiveTrue();
+    public List<OrderResponse> getOrdersByStatus(OrderStatus status) {
+        List<Order> orders = repository.findByOrderStatusIs(status);
 
         return orders
                 .stream()
-                .map(this::orderToDto)
+                .map(this::orderToResponse)
                 .toList();
     }
 
@@ -96,10 +100,56 @@ public class OrderService {
                 .builder()
                 .items(items)
                 .tableNumber(orderDTO.getTableNumber())
+                .orderStatus(OrderStatus.NEW)
                 .build();
         for (OrderItem item : order.getItems()) {
             item.setOrder(order);
         }
         return order;
+    }
+
+    private OrderResponse orderToResponse(Order order) {
+        OrderItemDTO[] items = order
+                .getItems()
+                .stream()
+                .map(orderItem -> OrderItemDTO
+                        .builder()
+                        .menuItem(
+                                MenuItemDTO.builder()
+                                        .id(orderItem.getMenuItem().getId())
+                                        .name(orderItem.getMenuItem().getName())
+                                        .description(orderItem.getMenuItem().getDescription())
+                                        .price(orderItem.getMenuItem().getPrice())
+                                        .category(orderItem.getMenuItem().getCategory().name())
+                                        .build()
+                        )
+                        .count(orderItem.getANumberOfItems())
+                        .build()
+                )
+                .toArray(OrderItemDTO[]::new);
+
+        return OrderResponse
+                .builder()
+                .id(order.getId())
+                .menuItems(items)
+                .user(order.getUser())
+                .tableNumber(order.getTableNumber())
+                .status(order.getOrderStatus().name())
+                .build();
+    }
+
+    public OrderResponse changeOrderStatus(Long id, String status) {
+        Order order = repository.getReferenceById(id);
+        OrderStatus orderStatus = switch (status) {
+            case "IN PROCESS" -> OrderStatus.IN_PROCESS;
+            case "WAITING PAYMENT" -> OrderStatus.WAITING_PAYMENT;
+            case "ARCHIVE" -> OrderStatus.ARCHIVE;
+            default -> OrderStatus.NEW;
+        };
+
+        order.setOrderStatus(orderStatus);
+        repository.save(order);
+
+        return orderToResponse(order);
     }
 }
