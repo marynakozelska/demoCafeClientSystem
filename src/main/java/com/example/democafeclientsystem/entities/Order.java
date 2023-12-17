@@ -31,8 +31,6 @@ public class Order {
     @Enumerated
     private OrderStatus orderStatus;
 
-//    TODO: add payment method
-
     public Order(Set<OrderItem> items, User user, int tableNumber) {
         this.items = items;
         this.user = user;

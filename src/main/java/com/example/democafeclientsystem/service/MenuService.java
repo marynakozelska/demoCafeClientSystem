@@ -2,6 +2,7 @@ package com.example.democafeclientsystem.service;
 
 import com.example.democafeclientsystem.dto.MenuItemDTO;
 import com.example.democafeclientsystem.entities.MenuItem;
+import com.example.democafeclientsystem.enums.FoodCategory;
 import com.example.democafeclientsystem.repositories.MenuRepository;
 import com.example.democafeclientsystem.repositories.OrderRepository;
 import lombok.RequiredArgsConstructor;
@@ -11,6 +12,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
+
+import static com.example.democafeclientsystem.enums.FoodCategory.*;
 
 @Service
 @RequiredArgsConstructor
@@ -31,7 +34,9 @@ public class MenuService {
                 .collect(Collectors.groupingBy(MenuItemDTO::getCategory));
     }
 
-    public MenuItemDTO addMenuItem(MenuItem menuItem) {
+    public MenuItemDTO addMenuItem(MenuItemDTO menuItemDTO) {
+        MenuItem menuItem = dtoToMenuItem(menuItemDTO);
+
         MenuItem menuItemSaved = repository.save(menuItem);
         return menuItemToDto(menuItemSaved);
     }
@@ -66,6 +71,29 @@ public class MenuService {
                 .name(menuItem.getName())
                 .description(menuItem.getDescription())
                 .price(menuItem.getPrice())
+                .category(category)
+                .build();
+    }
+
+    private MenuItem dtoToMenuItem(MenuItemDTO menuItemDTO) {
+        FoodCategory category;
+        switch (menuItemDTO.getCategory()) {
+            case "DESSERTS" -> category = DESSERTS;
+            case "PIZZA" -> category = PIZZA;
+            case "SOUPS" -> category = SOUPS;
+            case "DRINKS" -> category = DRINKS;
+            case "SALADS" -> category = SALADS;
+            case "SIDE DISH" -> category = SIDE_DISH;
+            case "BREAKFAST" -> category = BREAKFAST;
+            default -> category = null;
+        }
+
+        return MenuItem
+                .builder()
+                .id(menuItemDTO.getId())
+                .name(menuItemDTO.getName())
+                .description(menuItemDTO.getDescription())
+                .price(menuItemDTO.getPrice())
                 .category(category)
                 .build();
     }
