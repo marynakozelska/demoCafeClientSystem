@@ -15,7 +15,7 @@ import java.util.List;
 @RequestMapping
 @AllArgsConstructor
 public class UserController {
-    public UserService service;
+    private UserService service;
 
     @GetMapping("/profile")
     public ResponseEntity<UserDTO> getUser(Authentication authentication) {
@@ -40,12 +40,6 @@ public class UserController {
     @PutMapping("/users/manage/{id}")
     public ResponseEntity<UserDTO> manageUpdateUser(@PathVariable("id") int id,
                                                     @RequestBody String role) {
-
         return new ResponseEntity<>(service.manageUpdateUser(id, role), HttpStatus.OK);
     }
-
-//    TODO: get a list of orders by a particular user
-
-//    TODO: get a number of orders by a particular user ?
-
 }

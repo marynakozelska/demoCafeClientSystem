@@ -1,7 +1,6 @@
 package com.example.democafeclientsystem.controllers;
 
 import com.example.democafeclientsystem.dto.MenuItemDTO;
-import com.example.democafeclientsystem.entities.MenuItem;
 import com.example.democafeclientsystem.service.MenuService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -33,7 +32,7 @@ public class MenuController {
     }
 
     @PostMapping("/manage/add")
-    public ResponseEntity<MenuItemDTO> addMenuItem(@Valid @RequestBody MenuItem menuItem) {
+    public ResponseEntity<MenuItemDTO> addMenuItem(@Valid @RequestBody MenuItemDTO menuItem) {
         return ResponseEntity.ok(service.addMenuItem(menuItem));
     }
 

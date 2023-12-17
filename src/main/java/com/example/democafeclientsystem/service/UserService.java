@@ -37,19 +37,30 @@ public class UserService implements UserDetailsService {
 //    ADMIN MANAGING
 
     public UserDTO manageGetUser(int id) {
-        User user = userRepository.findById(id).get();
-        return userToDto(user);
+        Optional<User> userOptional = userRepository.findById(id);
+
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            return userToDto(user);
+        } else {
+            throw new UsernameNotFoundException(String.format("User ID = %s doesn't exist.", id));
+        }
     }
 
     public UserDTO manageUpdateUser(int id, String roleInput) {
+        Optional<User> userOptional = userRepository.findById(id);
 
-        var user = userRepository.findById(id).get();
-        Role role = roleRepository.findByName(roleInput);
+        if (userOptional.isPresent()) {
+            var user = userOptional.get();
+            Role role = roleRepository.findByName(roleInput);
 
-        user.setRole(role);
-        userRepository.save(user);
+            user.setRole(role);
+            userRepository.save(user);
 
-        return userToDto(user);
+            return userToDto(user);
+        } else {
+            throw new UsernameNotFoundException(String.format("User ID = %s doesn't exist.", id));
+        }
     }
 
     public List<UserDTO> manageGetAllUsers() {
