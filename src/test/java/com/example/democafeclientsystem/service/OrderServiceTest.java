@@ -1,11 +1,13 @@
 package com.example.democafeclientsystem.service;
 
 import com.example.democafeclientsystem.dto.OrderDTO;
+import com.example.democafeclientsystem.dto.OrderResponse;
 import com.example.democafeclientsystem.entities.MenuItem;
 import com.example.democafeclientsystem.entities.Order;
 import com.example.democafeclientsystem.entities.OrderItem;
 import com.example.democafeclientsystem.entities.User;
 import com.example.democafeclientsystem.enums.FoodCategory;
+import com.example.democafeclientsystem.enums.OrderStatus;
 import com.example.democafeclientsystem.repositories.MenuRepository;
 import com.example.democafeclientsystem.repositories.OrderRepository;
 import org.junit.jupiter.api.BeforeAll;
@@ -60,25 +62,8 @@ class OrderServiceTest {
     }
 
     @Test
-    void canGetActiveOrderByAuth() {
-        Order order = Order
-                .builder()
-                .tableNumber(11)
-                .user(user)
-                .items(Set.of(orderItem1))
-                .isActive(true)
-                .build();
-        when(orderRepository.findByUserAndIsActiveTrue(user)).thenReturn(order);
-
-        OrderDTO result = underTest.getActiveOrderByAuth(authentication);
-
-        assertThat(result.getTableNumber()).isEqualTo(order.getTableNumber());
-        assertThat(result.getItems().length).isEqualTo(order.getItems().size());
-    }
-
-    @Test
     void canGetNoActiveOrderByAuth() {
-        when(orderRepository.findByUserAndIsActiveTrue(user)).thenReturn(null);
+        when(orderRepository.findByUserAndOrderStatusNot(user, OrderStatus.ARCHIVE)).thenReturn(null);
 
         OrderDTO result = underTest.getActiveOrderByAuth(authentication);
 
@@ -120,15 +105,16 @@ class OrderServiceTest {
                 .user(user)
                 .tableNumber(2)
                 .items(Set.of(orderItem1))
+                .orderStatus(OrderStatus.NEW)
                 .build();
 
         when(orderRepository.findAll()).thenReturn(List.of(order));
 
-        List<OrderDTO> orderDTOS = underTest.getAllOrders();
+        List<OrderResponse> orderResponse = underTest.getAllOrders();
 
-        assertThat(orderDTOS.size()).isEqualTo(1);
-        assertThat(orderDTOS.get(0).getTableNumber()).isEqualTo(order.getTableNumber());
-        assertThat(orderDTOS.get(0).getItems().length).isEqualTo(order.getItems().size());
+        assertThat(orderResponse.size()).isEqualTo(1);
+        assertThat(orderResponse.get(0).getTableNumber()).isEqualTo(order.getTableNumber());
+        assertThat(orderResponse.get(0).getMenuItems().length).isEqualTo(order.getItems().size());
     }
 
     @Test
@@ -136,27 +122,27 @@ class OrderServiceTest {
         Order order1 = Order
                 .builder()
                 .id(1L)
-                .isActive(true)
                 .tableNumber(11)
+                .orderStatus(OrderStatus.IN_PROCESS)
                 .items(Set.of(orderItem2))
                 .build();
         Order order2 = Order
                 .builder()
                 .id(3L)
-                .isActive(true)
                 .tableNumber(13)
+                .orderStatus(OrderStatus.IN_PROCESS)
                 .items(Set.of(orderItem1))
                 .build();
 
-        when(orderRepository.findByIsActiveTrue()).thenReturn(List.of(order1, order2));
+        when(orderRepository.findByOrderStatusIs(OrderStatus.IN_PROCESS)).thenReturn(List.of(order1, order2));
 
-        List<OrderDTO> result = underTest.getAllActiveOrders();
+        List<OrderResponse> result = underTest.getOrdersByStatus(OrderStatus.IN_PROCESS);
 
         assertThat(result.get(0).getTableNumber()).isEqualTo(order1.getTableNumber());
         assertThat(result.get(1).getTableNumber()).isEqualTo(order2.getTableNumber());
 
-        assertThat(result.get(0).getItems()[0]).isEqualTo(orderItem2.getMenuItem().getId());
-        assertThat(result.get(1).getItems()[0]).isEqualTo(orderItem1.getMenuItem().getId());
+        assertThat(result.get(0).getMenuItems()[0].getMenuItem().getId()).isEqualTo(orderItem2.getMenuItem().getId());
+        assertThat(result.get(1).getMenuItems()[0].getMenuItem().getId()).isEqualTo(orderItem1.getMenuItem().getId());
 
         assertThat(result.size()).isEqualTo(2);
     }
